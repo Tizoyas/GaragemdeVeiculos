@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Garagem de Veículos</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    @{
+        var atual = ViewContext.RouteData.Values["controller"]?.ToString();
+    }
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <a class="marca" asp-controller="Reserva" asp-action="Index">
+                <span class="marca-sigla">GV</span>
+                <span>Garagem de Veículos</span>
+            </a>
+            <nav class="menu">
+                <a class="@(atual == "Reserva" ? "ativo" : null)" asp-controller="Reserva" asp-action="Index">Reservas</a>
+                <a class="@(atual == "Pessoa" ? "ativo" : null)" asp-controller="Pessoa" asp-action="Index">Pessoas</a>
+                <a class="@(atual == "Veiculo" ? "ativo" : null)" asp-controller="Veiculo" asp-action="Index">Veículos</a>
+            </nav>
+        </div>
+    </header>
+    <main class="container conteudo">
+        @RenderBody()
+    </main>
+    <footer class="rodape">
+        <div class="container">Administração da garagem · dados em arquivos JSON</div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

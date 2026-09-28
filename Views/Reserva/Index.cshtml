@@ -1,0 +1,172 @@
+@model ReservaPagina
+@{
+    ViewData["Title"] = "Reservas";
+    var editando = Model.Formulario.Id > 0;
+    var hoje = DateOnly.FromDateTime(DateTime.Today);
+    var podeReservar = Model.Pessoas.Any() && Model.Veiculos.Any();
+}
+
+<div class="page-head">
+    <div>
+        <p class="eyebrow">Página inicial</p>
+        <h1>Reservas</h1>
+    </div>
+    <p class="text-secondary mb-0">Situação em @hoje.ToString("dd/MM/yyyy")</p>
+</div>
+
+@if (TempData["Ok"] is string ok)
+{
+    <div class="aviso-ok">@ok</div>
+}
+
+<ul class="frota">
+    @foreach (var veiculo in Model.Veiculos)
+    {
+        <li class="@(veiculo.Reservado ? "ocupado" : "livre")">
+            <strong>@veiculo.Placa</strong>
+            <span>@veiculo.Descricao</span>
+            <em>@(veiculo.Reservado ? "Reservado" : "Disponível")</em>
+        </li>
+    }
+</ul>
+
+<section class="cartao-form mb-4">
+    <h2 class="h5 mb-3">@(editando ? "Editar período" : "Nova reserva")</h2>
+    @if (!podeReservar)
+    {
+        <p class="mb-0">Cadastre ao menos uma pessoa e um veículo antes de reservar.</p>
+    }
+    else
+    {
+        <form asp-action="@(editando ? "Edit" : "Create")" method="post">
+            <input type="hidden" name="Id" value="@Model.Formulario.Id" />
+            <div asp-validation-summary="ModelOnly"></div>
+            <div class="grade-form">
+                <div class="campo-largo">
+                    <label class="form-label" for="VeiculoId">Veículo</label>
+                    <select class="form-select" id="VeiculoId" name="VeiculoId">
+                        <option value="">Selecione</option>
+                        @foreach (var veiculo in Model.Veiculos)
+                        {
+                            if (Model.Formulario.VeiculoId == veiculo.Id)
+                            {
+                                <option value="@veiculo.Id" selected>@veiculo.Placa — @veiculo.Descricao</option>
+                            }
+                            else
+                            {
+                                <option value="@veiculo.Id">@veiculo.Placa — @veiculo.Descricao</option>
+                            }
+                        }
+                    </select>
+                    @Html.ValidationMessage("VeiculoId")
+                </div>
+                <div class="campo-largo">
+                    <label class="form-label" for="PessoaId">Pessoa</label>
+                    <select class="form-select" id="PessoaId" name="PessoaId">
+                        <option value="">Selecione</option>
+                        @foreach (var pessoa in Model.Pessoas)
+                        {
+                            if (Model.Formulario.PessoaId == pessoa.Id)
+                            {
+                                <option value="@pessoa.Id" selected>@pessoa.Nome</option>
+                            }
+                            else
+                            {
+                                <option value="@pessoa.Id">@pessoa.Nome</option>
+                            }
+                        }
+                    </select>
+                    @Html.ValidationMessage("PessoaId")
+                </div>
+                <div>
+                    <label class="form-label" for="DataInicio">Início</label>
+                    <input class="form-control" type="date" id="DataInicio" name="DataInicio" value="@(Model.Formulario.DataInicio == default ? null : Model.Formulario.DataInicio.ToString("yyyy-MM-dd"))" />
+                    @Html.ValidationMessage("DataInicio")
+                </div>
+                <div>
+                    <label class="form-label" for="DataFim">Fim</label>
+                    <input class="form-control" type="date" id="DataFim" name="DataFim" value="@(Model.Formulario.DataFim == default ? null : Model.Formulario.DataFim.ToString("yyyy-MM-dd"))" />
+                    @Html.ValidationMessage("DataFim")
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">@(editando ? "Salvar período" : "Reservar")</button>
+                    @if (editando)
+                    {
+                        <a class="btn btn-outline-secondary" asp-action="Index">Cancelar</a>
+                    }
+                </div>
+            </div>
+        </form>
+    }
+</section>
+
+<section class="painel">
+    <form method="get" class="filtro">
+        <div>
+            <label class="form-label" for="pessoaId">Pessoa</label>
+            <select class="form-select" id="pessoaId" name="pessoaId">
+                <option value="">Todas</option>
+                @foreach (var pessoa in Model.Pessoas)
+                {
+                    if (Model.FiltroPessoaId == pessoa.Id)
+                    {
+                        <option value="@pessoa.Id" selected>@pessoa.Nome</option>
+                    }
+                    else
+                    {
+                        <option value="@pessoa.Id">@pessoa.Nome</option>
+                    }
+                }
+            </select>
+        </div>
+        <div>
+            <label class="form-label" for="de">De</label>
+            <input class="form-control" type="date" id="de" name="de" value="@Model.FiltroDe?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div>
+            <label class="form-label" for="ate">Até</label>
+            <input class="form-control" type="date" id="ate" name="ate" value="@Model.FiltroAte?.ToString("yyyy-MM-dd")" />
+        </div>
+        <button type="submit" class="btn btn-outline-secondary">Filtrar</button>
+        <a class="btn btn-link" asp-action="Index">Limpar</a>
+    </form>
+
+    @if (!Model.Reservas.Any())
+    {
+        <p class="vazio">Nenhuma reserva encontrada.</p>
+    }
+    else
+    {
+        <table class="tabela">
+            <thead>
+                <tr>
+                    <th>Veículo</th>
+                    <th>Pessoa</th>
+                    <th>Período</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var reserva in Model.Reservas)
+                {
+                    <tr>
+                        <td>
+                            <strong>@reserva.Placa</strong><br />
+                            <span class="text-secondary">@reserva.Marca @reserva.Modelo</span>
+                        </td>
+                        <td>@reserva.Pessoa</td>
+                        <td>@reserva.DataInicio.ToString("dd/MM/yyyy") a @reserva.DataFim.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <div class="acoes">
+                                <a class="btn-cobre" asp-action="Edit" asp-route-id="@reserva.Id">Editar</a>
+                                <form asp-action="Delete" asp-route-id="@reserva.Id" method="post" onsubmit="return confirm('Cancelar esta reserva?');">
+                                    <button type="submit" class="btn-perigo">Cancelar</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</section>

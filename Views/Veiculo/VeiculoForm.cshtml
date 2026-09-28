@@ -1,0 +1,54 @@
+@model Veiculo
+@{
+    var editando = Model.Id > 0;
+    ViewData["Title"] = editando ? "Editar veículo" : "Novo veículo";
+}
+
+<div class="page-head">
+    <div>
+        <p class="eyebrow">Veículos</p>
+        <h1>@ViewData["Title"]</h1>
+    </div>
+</div>
+
+<div class="cartao-form">
+    <form asp-action="@(editando ? "Edit" : "Create")" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div asp-validation-summary="ModelOnly"></div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label asp-for="Placa" class="form-label">Placa</label>
+                <input asp-for="Placa" class="form-control" />
+                <span asp-validation-for="Placa"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Marca" class="form-label">Marca</label>
+                <input asp-for="Marca" class="form-control" />
+                <span asp-validation-for="Marca"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Modelo" class="form-label">Modelo</label>
+                <input asp-for="Modelo" class="form-control" />
+                <span asp-validation-for="Modelo"></span>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="Ano">Ano</label>
+                <input class="form-control" id="Ano" name="Ano" inputmode="numeric" value="@(Model.Ano == 0 ? null : Model.Ano.ToString())" />
+                @Html.ValidationMessage("Ano")
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Cor" class="form-label">Cor</label>
+                <input asp-for="Cor" class="form-control" placeholder="Opcional" />
+                <span asp-validation-for="Cor"></span>
+            </div>
+        </div>
+        <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <a class="btn btn-outline-secondary" asp-action="Index">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

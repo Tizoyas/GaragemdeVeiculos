@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "placa": "ABC1D23",
+    "marca": "Toyota",
+    "modelo": "Corolla",
+    "ano": 2022,
+    "cor": "Prata"
+  },
+  {
+    "id": 2,
+    "placa": "DEF4G56",
+    "marca": "Honda",
+    "modelo": "Civic",
+    "ano": 2021,
+    "cor": "Preto"
+  },
+  {
+    "id": 3,
+    "placa": "GHI7J89",
+    "marca": "Fiat",
+    "modelo": "Argo",
+    "ano": 2020,
+    "cor": "Branco"
+  }
+]
